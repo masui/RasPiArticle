@@ -1,0 +1,13 @@
+{
+  "name": "MediaPlayer",
+  "version": "0.0.1",
+  "private": true,
+  "author": "Toshiyuki Masui <masui@pitecan.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "coffee player.coffee"
+  },
+  "dependencies": {
+    "express": "4.4"
+  }
+}
