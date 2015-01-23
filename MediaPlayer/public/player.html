@@ -1,0 +1,44 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>RasPiPlayer</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script src="javascripts/coffee-script.js"></script>
+</head>
+<body>
+<h1>RasPi Player</h1>
+タイトルをクリックするとRaspberry Piで再生されます:
+
+<ul id="list">
+</ul>
+
+<span id="stop" style="color:blue"><b>停止</b></span>
+
+<script type="text/coffeescript">
+contents = [
+  { title: "Planet Earth", url: "/play/home/pi/PlanetEarthA-1.mp4" }
+  { title: "Rocky Horror", url: "/play/home/pi/RockyHorrowPictureShow.mp4" }
+  { title: "Family",       url: "/play/home/pi/Family.mp3" }
+  { title: "Estate",       url: "/youtube/yPuiDrXp2XA" } 
+  { title: "Poinciana",    url: "/youtube/SiARr9JhLEo" }
+]
+
+clickfunc = (url) ->
+  ->
+    $.ajax
+      url: url
+
+for content, i in contents
+  item = $('<li>')
+    .text content.title
+    .css "color", "#007000"
+    .on 'click', clickfunc content.url
+  $('#list').append item
+
+$('#stop').on 'click', ->
+  $.ajax
+    url: "/stop"
+
+</script>
+</body>
+</html>
