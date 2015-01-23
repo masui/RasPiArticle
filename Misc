@@ -1,0 +1,61 @@
+Raspbianインストール
+
+Nodeインストール
+  http://shokai.org/blog/archives/8583
+    wget http://nodejs.org/dist/v0.10.28/node-v0.10.28-linux-arm-pi.tar.gz
+    tar -zxvf node-v0.10.28-linux-arm-pi.tar.gz
+    sudo mv node-v0.10.28-linux-arm-pi /usr/local/node
+
+Expressインストール
+  sudo /usr/local/node/bin/npm install -g express
+  sudo /usr/local/node/bin/npm install -g express-generator
+
+package.jsonで4.4を指定しないと動かない?
+
+Express テスト
+  express -e app1
+  cd app1
+  npm install
+  ./bin/www
+
+動かない
+
+npm update してみる
+  インストールやりなおし
+
+  sudo /usr/local/node/bin/npm install -g ipaddr してみる
+  駄目
+
+mkdir myapp
+cd myapp
+npm init
+npm i express -save
+
+sudo /usr/local/node/bin/npm uninstall -g express
+
+package.jsonで、expressのバージョン番号を "<4.5" としたらうまくいった?
+
+これでExpressがやっと動いた
+
+
+----
+
+rpi-gpioを入れてみる
+
+動かない...
+
+いろいろ調べてここを発見
+http://thefloppydisk.wordpress.com/2013/06/06/raspberry-pi-gpio-inputoutput-in-javascript/
+なんと、ポート番号じゃなくてピン番号を使うのだと!
+
+gpio-admin
+https://github.com/quick2wire/quick2wire-gpio-admin
+うまく動かない
+
+changeのイベントがとれない
+
+# nursesのインストール
+sudo apt-get install libncurses5-dev
+
+Rubyでcurses
+http://seeku.hateblo.jp/entry/2013/06/27/213848
