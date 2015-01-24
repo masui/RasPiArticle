@@ -60,3 +60,9 @@ sudo apt-get install libncurses5-dev
 
 Rubyでcurses
 http://seeku.hateblo.jp/entry/2013/06/27/213848
+
+一般ユーザ(e.g. masui)がomxplayer使うには
+/etc/group の video に追加する必要がある
+
+
+
