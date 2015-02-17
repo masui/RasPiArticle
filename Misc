@@ -60,8 +60,26 @@ sudo apt-get install libncurses5-dev
 Rubyでcurses
 http://seeku.hateblo.jp/entry/2013/06/27/213848
 
-一般ユーザ(e.g. masui)がomxplayer使うには
+*** 一般ユーザ(e.g. masui)がomxplayer使うには
 /etc/group の video に追加する必要がある
 
+RasPiでSDL
+https://github.com/jlnr/gosu/wiki/Getting-Started-on-Raspbian-%28Raspberry-Pi%29
+
+モナーフォント
+http://www.geocities.jp/ipa_mona/
+
+SDL
+sudo apt-get install libsdl1.2-dev libsdl1.2debian
 
 
+"Gosu" というRubyのゲームエンジンを使うと日本語表示できるが入力イベントをとれない
+  GosuはSDL2を使ってるので、SDLでやればいいのかもしれない
+
+RasPiへのSDL2のインストールのやり方はGosuのページに書いてある
+  https://github.com/jlnr/gosu/wiki/Getting-Started-on-Raspbian-%28Raspberry-Pi%29
+
+SDLでコンパイルできるようになった
+ライブラリは/etc/ld.so.conf編集してからldconfig
+
+しかしSDLで入力がとれない...
