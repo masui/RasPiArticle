@@ -14,7 +14,6 @@ def readltsv(file)
     f.each { |line|
       line.chomp!
       next if line =~ /^\s*$/m || line =~ /^#/m
-      
       line.sub!(/^(\s*)/,'')
       indent = $&.length
       
@@ -31,18 +30,7 @@ def readltsv(file)
   root
 end
 
-def initlinks_xxx(nodes, parent, level)
-  nodes.each_with_index { |node,i|
-    node['level'] = level
-    node['elder'] = (i > 0 ? nodes[i-1] : nil)
-    node['younger'] = (i < nodes.length-1 ? nodes[i+1] : nil)
-    node['parent'] = parent
-    initlinks(node['children'],node,level+1) if node['children']
-  }
-end
-
 def initlinks(node, level)
-#  puts "-----#{node['title']}"
   children = node['children']
   children.each_with_index { |childnode,i|
     childnode['level'] = level+1
@@ -55,7 +43,6 @@ end
 
 def nextNode(node)
   nextnode = node['younger']
-  #puts "nextnode = #{nextnode}"
   while !nextnode && node['parent'] do
     node = node['parent']
     nextnode = node['younger']
@@ -65,31 +52,21 @@ end
 
 def prevNode(node)
   prevnode = node['elder']
-#  puts "prevnode = <#{prevnode}>"
   while !prevnode && node['parent'] do
     prevnode = node['parent']
   end
   prevnode
 end
 
-def calc(centerNode) # centerNodeを中心にnodeListを再計算して表示
-#  puts "centerNOde.title = #{centerNode['title']}"
-  nodelist = {} # 毎回富豪的にリストを生成
+def calc(centerNode) # centerNodeを中心にnodeListを計算
+  nodelist = {}
   nodelist[0] = centerNode
   node = centerNode
-#  puts "----centerNode.prev = #{prevNode(node)}"
-
   i = 0
-  while node = nextNode(node) do
-    nodelist[i+=1] = node 
-#    puts "i = #{i}"
-  end
+  nodelist[i+=1] = node while node = nextNode(node)
   node = centerNode
   i = 0
-  while node = prevNode(node) do
-    nodelist[i-=1] = node
-#    puts "i = #{i}"
-  end
+  nodelist[i-=1] = node while node = prevNode(node)
   nodelist
 end
 
@@ -97,10 +74,7 @@ root = readltsv 'contents.ltsv'
 initlinks root, 0
 
 calc(root['children'][0]).each { |key,val|
-# calc(root).each { |key,val|
   puts key
   puts val['title']
 }
-
-
 # puts root['children'][0]['children'][0]['children'][0]['title']
