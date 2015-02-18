@@ -3,10 +3,10 @@ require "curses"
 include Curses
 
 init_screen
-#start_color #!!!!
+start_color # これがないと色が出ないorz ... アホな仕様か
 
-#init_pair 1, COLOR_YELLOW, COLOR_BLUE
-#init_pair 2, COLOR_BLACK, COLOR_WHITE
+init_pair 1, COLOR_YELLOW, COLOR_BLUE
+init_pair 2, COLOR_BLACK, COLOR_WHITE
 
 stdscr.bkgd color_pair(1)
 stdscr.attrset color_pair(1)
