@@ -5,6 +5,18 @@
 #
 
 require 'json'
+require "curses"
+include Curses
+
+init_screen
+#start_color # これがないと色が出ないorz ... アホな仕様か
+#init_pair 1, COLOR_YELLOW, COLOR_BLUE
+#init_pair 2, COLOR_BLACK, COLOR_WHITE
+#stdscr.bkgd color_pair(1)
+#stdscr.attrset color_pair(1)
+#refresh
+#clear
+noecho
 
 def readltsv(file)
   root = { 'title' => '全コンテンツ' }
@@ -72,6 +84,22 @@ end
 
 root = readltsv 'contents.ltsv'
 initlinks root, 0
+
+#
+# メインループ
+#
+
+centernode = root['children'][0]
+
+while true do
+  calc(centernode).each { |key,val|
+    stdscr.setpos 12+key, 3+val['level'].to_i
+    stdscr.addstr val['title']
+  }
+  c = getch
+  puts c
+end
+
 
 calc(root['children'][0]).each { |key,val|
   puts key
