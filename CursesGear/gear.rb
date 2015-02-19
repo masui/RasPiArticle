@@ -10,21 +10,21 @@ require "curses"
 include Curses
 
 init_screen
-start_color # これがないと色が出ないorz ... アホな仕様か
-init_pair 1, COLOR_YELLOW, COLOR_BLUE
-init_pair 2, COLOR_BLACK, COLOR_WHITE
-stdscr.bkgd color_pair(2)
-stdscr.attrset color_pair(2)
-
 refresh
 clear
-refresh
 
-stdscr.keypad true    # up/downキーの扱い http://rb.blog.pasberth.com/post/27046375001/ruby-curses
-noecho
-
-@nodelist = {}
+@nodelist = []
 @timeout = nil
+
+def play(file)
+  system "killall omxplayer omxplayer.bin > /dev/null 2> /dev/null"
+  if file =~ /^http.*youtube.com/ then
+    #stream = `youtube-dl -g #{file}`
+    #system "omxplayer '#{stream.chomp}' > /dev/null &"
+  elsif file =~ /^\// then
+    #system "omxplayer '#{file}' > /dev/null &"
+  end
+end
 
 def readltsv(file)
   root = { 'title' => '全コンテンツ' }
@@ -79,7 +79,8 @@ def prevNode(node)
 end
 
 def calc # @centerNodeを中心にnodelistを計算
-  @nodelist = { 0 => @centerNode }
+  @nodelist = {}
+  @nodelist[0] = @centerNode
   node = @centerNode
   i = 0
   @nodelist[i+=1] = node while node = nextNode(node)
@@ -103,12 +104,12 @@ end
 def cls
   (0...30).each { |y|
     stdscr.setpos y, 0
-    stdscr.addstr "                                                              "
+    stdscr.addstr "                                                     "
   }
 end
 
 def display
-  cls
+  #cls
   setpos 12,2
   addstr "======================================="
   @nodelist.each { |key,val|
@@ -118,6 +119,10 @@ def display
   setpos 12,1
   addstr "="
   refresh
+  
+  center = @nodelist[0]
+  #@player.play center['file'] if center['file']
+  play center['file'] # if center['file']
 end
 
 def move(delta)
@@ -134,31 +139,26 @@ end
 root = readltsv 'contents.ltsv'
 initlinks root, 0
 
-# @centerNode = root['children'][0]
 @centerNode = root
 
 calc
-
-@timeout = Concurrent::ScheduledTask.execute 1 do
-  expand
-end
 
 #
 # メインループ
 #
 
-while true do
-  c = getch
-  # line = STDIN.readline.chomp
+File.open("/dev/input/event0","rb"){ |f|
+  while true do
+    @timeout.stop if @timeout
+    @timeout = Concurrent::ScheduledTask.execute 1 do
+      expand
+    end
 
-  @timeout.stop if @timeout
-  @timeout = Concurrent::ScheduledTask.execute 1 do
-    expand
+    s = f.read 16
+    (time, type, code, value) = s.unpack "qssi"
+    if type == 2 and code == 8 then
+      move value == 1 ? -1 : 1
+    end
   end
+}
 
-  if c == Key::UP
-    move -1
-  elsif c == Key::DOWN
-    move 1
-  end
-end
