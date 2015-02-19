@@ -118,6 +118,22 @@ def display
   setpos 12,1
   addstr "="
   refresh
+  
+  center = @nodelist[0]
+  play center['file'] if center['file']
+end
+
+def play(file)
+  if file =~ /^http.*youtube.com/ then
+    stream = `youtube-dl -g #{file}`
+    system "killall omxplayer omxplayer.bin 2> /dev/null"
+    sleep 1
+    system "omxplayer --win '0 0 800 500' '#{stream.chomp}' > /dev/null"
+  elsif file =~ /^\// then
+    system "killall omxplayer omxplayer.bin 2> /dev/null"
+    sleep 1
+    system "omxplayer --win '0 0 800 500' '#{file}' > /dev/null"
+  end
 end
 
 def move(delta)
@@ -149,7 +165,6 @@ end
 
 while true do
   c = getch
-  # line = STDIN.readline.chomp
 
   @timeout.stop if @timeout
   @timeout = Concurrent::ScheduledTask.execute 1 do
@@ -160,5 +175,7 @@ while true do
     move -1
   elsif c == Key::DOWN
     move 1
+  elsif c == "q"
+    exit
   end
 end
