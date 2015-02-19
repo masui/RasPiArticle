@@ -12,8 +12,6 @@ include Curses
 init_screen
 refresh
 clear
-# keypad true    # up/downキーの扱い http://rb.blog.pasberth.com/post/27046375001/ruby-curses
-# noecho
 
 @nodelist = []
 @timeout = nil
@@ -164,21 +162,3 @@ File.open("/dev/input/event0","rb"){ |f|
   end
 }
 
-#while true do
-#  if false then
-#    @timeout.stop if @timeout
-#    @timeout = Concurrent::ScheduledTask.execute 1 do
-#      expand
-#    end
-#
-#    c = getch
-#
-#    if c == Key::UP
-#      move -1
-#    elsif c == Key::DOWN
-#      move 1
-#    elsif c == "q"
-#      exit
-#    end
-#  end
-#end
