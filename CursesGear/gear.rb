@@ -20,9 +20,11 @@ def play(file)
   system "killall omxplayer omxplayer.bin > /dev/null 2> /dev/null"
   if file =~ /^http.*youtube.com/ then
     stream = `youtube-dl -g #{file}`
-    system "omxplayer --win '0 0 800 500' '#{stream.chomp}' > /dev/null &"
+    #system "omxplayer --win '0 0 800 500' '#{stream.chomp}' > /dev/null &"
+    system "omxplayer '#{stream.chomp}' > /dev/null &"
   elsif file =~ /^\// then
-    system "omxplayer --win '0 0 800 500' '#{file}' > /dev/null &"
+    #system "omxplayer --win '0 0 800 500' '#{file}' > /dev/null &"
+    system "omxplayer '#{file}' > /dev/null &"
   end
 end
 
