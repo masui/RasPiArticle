@@ -25,6 +25,20 @@ noecho
 @nodelist = []
 @timeout = nil
 
+class Player
+  def play(file)
+    system "killall omxplayer omxplayer.bin > /dev/null 2> /dev/null"
+    if file =~ /^http.*youtube.com/ then
+      stream = `youtube-dl -g #{file}`
+      system "omxplayer --win '0 0 800 500' '#{stream.chomp}' > /dev/null &"
+    elsif file =~ /^\// then
+      system "omxplayer --win '0 0 800 500' '#{file}' > /dev/null &"
+    end
+  end
+end
+
+@player = Player.new
+
 def readltsv(file)
   root = { 'title' => '全コンテンツ' }
   parents = [root]
@@ -120,20 +134,7 @@ def display
   refresh
   
   center = @nodelist[0]
-  play center['file'] if center['file']
-end
-
-def play(file)
-  if file =~ /^http.*youtube.com/ then
-    stream = `youtube-dl -g #{file}`
-    system "killall omxplayer omxplayer.bin 2> /dev/null"
-    sleep 1
-    system "omxplayer --win '0 0 800 500' '#{stream.chomp}' > /dev/null"
-  elsif file =~ /^\// then
-    system "killall omxplayer omxplayer.bin 2> /dev/null"
-    sleep 1
-    system "omxplayer --win '0 0 800 500' '#{file}' > /dev/null"
-  end
+  @player.play center['file'] if center['file']
 end
 
 def move(delta)
