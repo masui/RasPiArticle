@@ -10,34 +10,14 @@ require "curses"
 include Curses
 
 init_screen
-#start_color # これがないと色が出ないorz ... アホな仕様か
-#init_pair 1, COLOR_YELLOW, COLOR_BLUE
-#init_pair 2, COLOR_BLACK, COLOR_WHITE
-#stdscr.bkgd color_pair(1)
-#stdscr.attrset color_pair(1)
-
 refresh
 clear
-
-stdscr.keypad true    # up/downキーの扱い http://rb.blog.pasberth.com/post/27046375001/ruby-curses
-noecho
+# keypad true    # up/downキーの扱い http://rb.blog.pasberth.com/post/27046375001/ruby-curses
+# noecho
 
 @nodelist = []
 @timeout = nil
 
-class Player
-  def play(file)
-    system "killall omxplayer omxplayer.bin > /dev/null 2> /dev/null"
-    if file =~ /^http.*youtube.com/ then
-      stream = `youtube-dl -g #{file}`
-      system "omxplayer --win '0 0 800 500' '#{stream.chomp}' > /dev/null &"
-    elsif file =~ /^\// then
-      system "omxplayer --win '0 0 800 500' '#{file}' > /dev/null &"
-    end
-  end
-end
-
-#@player = Player.new
 def play(file)
   system "killall omxplayer omxplayer.bin > /dev/null 2> /dev/null"
   if file =~ /^http.*youtube.com/ then
@@ -161,14 +141,9 @@ end
 root = readltsv 'contents.ltsv'
 initlinks root, 0
 
-# @centerNode = root['children'][0]
 @centerNode = root
 
 calc
-
-@timeout = Concurrent::ScheduledTask.execute 1 do
-  expand
-end
 
 #
 # メインループ
@@ -176,6 +151,11 @@ end
 
 File.open("/dev/input/event0","rb"){ |f|
   while true do
+    @timeout.stop if @timeout
+    @timeout = Concurrent::ScheduledTask.execute 1 do
+      expand
+    end
+
     s = f.read 16
     (time, type, code, value) = s.unpack "qssi"
     if type == 2 and code == 8 then
@@ -184,21 +164,21 @@ File.open("/dev/input/event0","rb"){ |f|
   end
 }
 
-while true do
-  if false then
-    c = getch
-
-    @timeout.stop if @timeout
-    @timeout = Concurrent::ScheduledTask.execute 1 do
-      expand
-    end
-
-    if c == Key::UP
-      move -1
-    elsif c == Key::DOWN
-      move 1
-    elsif c == "q"
-      exit
-    end
-  end
-end
+#while true do
+#  if false then
+#    @timeout.stop if @timeout
+#    @timeout = Concurrent::ScheduledTask.execute 1 do
+#      expand
+#    end
+#
+#    c = getch
+#
+#    if c == Key::UP
+#      move -1
+#    elsif c == Key::DOWN
+#      move 1
+#    elsif c == "q"
+#      exit
+#    end
+#  end
+#end
