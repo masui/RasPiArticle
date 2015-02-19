@@ -37,7 +37,7 @@ class Player
   end
 end
 
-@player = Player.new
+#@player = Player.new
 
 def readltsv(file)
   root = { 'title' => '全コンテンツ' }
@@ -134,7 +134,8 @@ def display
   refresh
   
   center = @nodelist[0]
-  @player.play center['file'] if center['file']
+  #@player.play center['file'] if center['file']
+  play center['file'] if center['file']
 end
 
 def move(delta)
@@ -158,6 +159,16 @@ calc
 
 @timeout = Concurrent::ScheduledTask.execute 1 do
   expand
+end
+
+def play(file)
+  system "killall omxplayer omxplayer.bin > /dev/null 2> /dev/null"
+  if file =~ /^http.*youtube.com/ then
+    stream = `youtube-dl -g #{file}`
+    system "omxplayer --win '0 0 800 500' '#{stream.chomp}' > /dev/null &"
+  elsif file =~ /^\// then
+    system "omxplayer --win '0 0 800 500' '#{file}' > /dev/null &"
+  end
 end
 
 #
