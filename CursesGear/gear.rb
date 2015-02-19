@@ -38,6 +38,15 @@ class Player
 end
 
 #@player = Player.new
+def play(file)
+  system "killall omxplayer omxplayer.bin > /dev/null 2> /dev/null"
+  if file =~ /^http.*youtube.com/ then
+    stream = `youtube-dl -g #{file}`
+    system "omxplayer --win '0 0 800 500' '#{stream.chomp}' > /dev/null &"
+  elsif file =~ /^\// then
+    system "omxplayer --win '0 0 800 500' '#{file}' > /dev/null &"
+  end
+end
 
 def readltsv(file)
   root = { 'title' => '全コンテンツ' }
@@ -135,7 +144,7 @@ def display
   
   center = @nodelist[0]
   #@player.play center['file'] if center['file']
-  play center['file'] if center['file']
+  play center['file'] # if center['file']
 end
 
 def move(delta)
@@ -161,33 +170,35 @@ calc
   expand
 end
 
-def play(file)
-  system "killall omxplayer omxplayer.bin > /dev/null 2> /dev/null"
-  if file =~ /^http.*youtube.com/ then
-    stream = `youtube-dl -g #{file}`
-    system "omxplayer --win '0 0 800 500' '#{stream.chomp}' > /dev/null &"
-  elsif file =~ /^\// then
-    system "omxplayer --win '0 0 800 500' '#{file}' > /dev/null &"
-  end
-end
-
 #
 # メインループ
 #
 
-while true do
-  c = getch
-
-  @timeout.stop if @timeout
-  @timeout = Concurrent::ScheduledTask.execute 1 do
-    expand
+File.open("/dev/input/event0","rb"){ |f|
+  while true do
+    s = f.read 16
+    (time, type, code, value) = s.unpack "qssi"
+    if type == 2 and code == 8 then
+      move value == 1 ? -1 : 1
+    end
   end
+}
 
-  if c == Key::UP
-    move -1
-  elsif c == Key::DOWN
-    move 1
-  elsif c == "q"
-    exit
+while true do
+  if false then
+    c = getch
+
+    @timeout.stop if @timeout
+    @timeout = Concurrent::ScheduledTask.execute 1 do
+      expand
+    end
+
+    if c == Key::UP
+      move -1
+    elsif c == Key::DOWN
+      move 1
+    elsif c == "q"
+      exit
+    end
   end
 end
