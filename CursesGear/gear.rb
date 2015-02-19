@@ -5,22 +5,25 @@
 #
 
 require 'json'
+require 'concurrent' # http://ruby-concurrency.github.io/concurrent-ruby/Concurrent/ScheduledTask.html
 require "curses"
 include Curses
 
-#init_screen
+init_screen
 #start_color # これがないと色が出ないorz ... アホな仕様か
 #init_pair 1, COLOR_YELLOW, COLOR_BLUE
 #init_pair 2, COLOR_BLACK, COLOR_WHITE
 #stdscr.bkgd color_pair(1)
 #stdscr.attrset color_pair(1)
-#refresh
-#clear
+
+refresh
+clear
+
 stdscr.keypad true    # up/downキーの扱い http://rb.blog.pasberth.com/post/27046375001/ruby-curses
-#puts Key::UP
 noecho
 
 @nodelist = []
+@timeout = nil
 
 def readltsv(file)
   root = { 'title' => '全コンテンツ' }
@@ -87,10 +90,15 @@ def calc # @centerNodeを中心にnodelistを計算
   display
 end
 
-#def expand
-#  if @nodelist[0]['children']
-#    calc @nodelist[0].children[0]
-#    expandTimeout = setTimeout expand, StepTime
+def expand
+  if @nodelist[0]['children']
+    @centerNode = @nodelist[0]['children'][0]
+    calc
+    @timeout = Concurrent::ScheduledTask.execute 1 do
+      expand
+    end
+  end
+end
 
 def cls
   (0...30).each { |y|
@@ -101,12 +109,15 @@ end
 
 def display
   cls
+  setpos 12,2
+  addstr "======================================="
   @nodelist.each { |key,val|
-    stdscr.setpos 12+key, 3+val['level'].to_i
-    s = val['title']
-    s += "-----" if key == '0'
-    stdscr.addstr val['title'] + key.to_s
+    setpos 12+key, 3+val['level'].to_i*2
+    addstr val['title']
   }
+  setpos 12,1
+  addstr "="
+  refresh
 end
 
 def move(delta)
@@ -116,17 +127,21 @@ def move(delta)
   end
 end
 
+
 #
 # 初期化
 #
 root = readltsv 'contents.ltsv'
 initlinks root, 0
 
-@centerNode = root['children'][0]
+# @centerNode = root['children'][0]
+@centerNode = root
 
 calc
 
-#nodelist = calc(centerNode)
+@timeout = Concurrent::ScheduledTask.execute 1 do
+  expand
+end
 
 #
 # メインループ
@@ -134,10 +149,16 @@ calc
 
 while true do
   c = getch
+  # line = STDIN.readline.chomp
+
+  @timeout.stop if @timeout
+  @timeout = Concurrent::ScheduledTask.execute 1 do
+    expand
+  end
+
   if c == Key::UP
-    move 1
-  elsif c == Key::DOWN
     move -1
+  elsif c == Key::DOWN
+    move 1
   end
 end
-
