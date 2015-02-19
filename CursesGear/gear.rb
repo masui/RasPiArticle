@@ -23,7 +23,7 @@ refresh
 stdscr.keypad true    # up/downキーの扱い http://rb.blog.pasberth.com/post/27046375001/ruby-curses
 noecho
 
-@nodelist = []
+@nodelist = {}
 @timeout = nil
 
 def readltsv(file)
@@ -79,8 +79,7 @@ def prevNode(node)
 end
 
 def calc # @centerNodeを中心にnodelistを計算
-  @nodelist = {}
-  @nodelist[0] = @centerNode
+  @nodelist = { 0 => @centerNode }
   node = @centerNode
   i = 0
   @nodelist[i+=1] = node while node = nextNode(node)
