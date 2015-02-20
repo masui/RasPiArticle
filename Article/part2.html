@@ -28,6 +28,10 @@ GPIOとか
 
 ■ ディスプレイに何を使うか
 
+RasPiのGPUは
+
+OpenGL ES2
+
 X11のフレームメモリとOpenGL/GPUの画像バッファは違うところにある
 
 OpenGL
@@ -55,11 +59,19 @@ RasPiをメディアプレーヤとして使う場合はomxplayerだけ用意し
 <p>
 Gearではテキストベースのメニューを表示する必要があります。
 
+OpenGL ES2が使える
+その上に実装されたSDL
+
 RasPiでは、
 様々な環境で利用するグラフィクプラットフォームである「SVG」を利用して
 Rubyなどからオシャレな描画が可能なのですが、
 SVGもGPUを利用しているため残念ながらomxplayerと併用することができないようです。
 (SVGでメニューを描いているとき動画再生ができない)
+
+というか、Gearの表示を保ったまま動画再生ができない、か
+
+SDLが動かしながらomxplayerは使えないようなので、
+
 
 一方、フレームバッファはGPUの管理する画面と別になっているようなので
 フレームバッファにテキストを「直書き」すれば
@@ -100,7 +112,9 @@ X11のようなウィンドウシステムを使わなくても
 マウスの操作をRasPiのプログラムで読むことが簡単にできるので、
 ホイールの回転でGear操作を行なうことが妥当だと思います。
 
-マウスの操作は以下のようなプログラムで取得することができます。
+RasPiでは
+マウスの状態は /dev/input/event0 から取得できるので、
+X11を起動しなくても簡単にマウスを利用することができます。
 
 <h2>Gearの実装</h2>
 
@@ -109,7 +123,11 @@ X11のようなウィンドウシステムを使わなくても
 
 <h3>メニュー表示</h3>
 
-fbtermで大きな文字を表示します。
+デフォルトの起動ターミナルは日本語が表示できませんし
+フォントサイズが小さいので、
+フレームバッファを利用したターミナルプログラム
+fbterm
+を利用して大きな文字を表示します。
 
 ncursesで用意されている以下の関数を利用します。 
 
@@ -119,6 +137,59 @@ ncursesで用意されている以下の関数を利用します。
 <li>クリヤ
 </ul>
 
+<h3>タイムアウト処理</h3>
+
+Gearでは、
+選択中の項目に子要素があるときにユーザが何も操作を行なわなければ
+子要素を自動的に展開してその最初の項目を選択するようになっています。
+このようなタイムアウト処理はJavaScriptではsetTimeout()で簡単に指定できますが、
+Rubyにはタイムアウト関数が用意されていませんので、
+ruby-concurrency
+というgemを使うことにします。
+(gem install ruby-concurrency-ext)
+
+10秒後に何かを実行したい場合は以下のようにします。
+明示的にスレッドを起動する必要がないので便利です。
+
+<pre>
+Concurrent::ScheduledTask.execute 10 do
+  do_something # 10秒後に実行される処理
+end
+</pre>
+
+<h3>コンテンツの記述</h3>
+
+音楽や動画などのコンテンツは内容に従って階層的に分類しておきます。
+階層的なデータを表現する方法はいろいろありますが、
+ここでは「ltsv」にインデントを追加した「階層ltsv」を使うことにします。
+たとえば以下のような記述では、
+「YouTube」の「増井俊之」に3個のコンテンツが含まれていることを表現しています。
+
+<pre>
+title:YouTube
+ title:増井俊之
+  title:Slime	file:http://www.youtube.com/watch?v=Ldyl5UbbSA8
+  title:Gyazz	file:http://www.youtube.com/watch?v=RatK2q6SwFA
+  title:Dynamic Macro	file:http://www.youtube.com/watch?v=payhPO7Zi4w
+title:音楽
+ title:John Coltrane
+  title:My Favorite Things
+   title:My Favorite Things	file:/home/masui/Music/John Coltrane/My Favorite Things/01 My Favorite Things.mp3
+   title:Everytime We Say Goodbye	file:/home/masui/Music/John Coltrane/My Favorite Things/02 Everytime We Say Goodbye.mp3
+   title:Summertime	file:/home/masui/Music/John Coltrane/My Favorite Things/03 Summertime.mp3
+   title:But Not For Me	file:/home/masui/Music/John Coltrane/My Favorite Things/04 But Not For Me.mp3
+title:ムービー
+ title:Rocky Horrow Show	file:/home/masui/Movies/RockyHorrowPictureShow.mp4
+ title:Planet Earth	file:/home/masui/Movies/PlanetEarthA-1.mp4
+</pre>
+
+<h3>ナビゲーション</h3>
+
+これらの機能を全部入れると150行ぐらいでした。
+
+<h2>おまけ</h2>
+
+2月に本を出しました
 
 </body>
 </html>
