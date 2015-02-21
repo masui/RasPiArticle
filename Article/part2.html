@@ -85,7 +85,7 @@ GPUで描画した画像データを /dev/fd0 から読むことはできませ�
 
 <p>
 これらのハードウェア機能を利用して、
-以下のような方法で文字や図形描画することができます。
+以下のような方法で文字や図形を描画することができます。
 
 <ol>
 <li>X11を使う
@@ -93,14 +93,14 @@ GPUで描画した画像データを /dev/fd0 から読むことはできませ�
 ブラウザのHTMLで文字や矩形を表示したり、
 ブラウザのJavaScriptでCanvasに描画したりできます。
 また、JavaやProcessingでX11のウィンドウに描画を行なうこともできますし、
-Xlibで直接X11に指令を出すこともできます。
+Xlibを使って直接X11の描画プリミティブを利用することもできます。
 
 <li>フレームバッファに直書きする
 <br>
 /dev/fd0にビットマップ描画が可能です。
 また、フレームバッファを利用して文字出力を行なう
 fbterm
-というプログラムを利用すると、
+という端末プログラムを利用すると、
 VT100互換のターミナル画面を様々なサイズで表示することができます。
 
 <li><a href="http://ja.wikipedia.org/wiki/OpenGL_ES">OpenGL ES2</a>を使う
@@ -135,7 +135,7 @@ Raspberry PiのX11上のブラウザでは
 GPUを利用するomxplayerで動画を表示する場合、
 GPUベースの描画システムを使うことができません。
 つまり、omxplayerを使う場合は
-OpenGL ESやSDLでメニュー表示することができません。
+OpenGL ES2やSDLでメニューを表示することができません。
 
 また、
 X11上の描画システムはomxplayerと共存はできるのですが、
@@ -147,10 +147,10 @@ Javaなどを使う場合も同様です。
 今回はfbterm上に表示するテキストで
 メニュー操作を行なうことにします。
 
-残念ながら文字位置を行/桁単位でしか指定できませんから
+残念ながら文字位置を行/桁単位でしか指定できませんから、
 なめらかなアニメーション表示などはできませんし、
-色も規程された数色しか利用できず、
-今時のコンピュータとは思えない残念な感じのメニュー表示になってしまいますが、
+色も規程された数種類しか利用できず、
+現代のコンピュータとは思えない残念な感じのメニュー表示になってしまいますが、
 今回はとりあえずそれで我慢したいと思います。
 
 ターミナル上のテキスト表示には
@@ -184,7 +184,7 @@ Raspberry PiではX11を使わなくても
 (ちなみに
 Raspbianで初期設定されている「pi」というアカウントでは
 omxplayerやマウス入力を問題なく利用できますが、
-異なるアカウントで使おうとすると
+異なるアカウントで使おうとする場合は
 /etc/group
 の設定を変更したり
 /dev/vchiq
@@ -229,11 +229,6 @@ require "curses" # ncursesライブラリ
 setpos 10, 2     # 10行目の2桁目にカーソル移動
 addstr "abc"     # カーソル位置に"abc"表示
 </pre>
-</blockquote>
-
-Gearを起動する
-
-<blockquote>
 </blockquote>
 
 <h3>タイムアウト処理</h3>
@@ -287,13 +282,13 @@ title:YouTube
 title:音楽
  title:John Coltrane
   title:My Favorite Things
-   title:My Favorite Things&lt;tab&gt;file:/home/masui/Music/John Coltrane/My Favorite Things/01 My Favorite Things.mp3
-   title:Everytime We Say Goodbye&lt;tab&gt;file:/home/masui/Music/John Coltrane/My Favorite Things/02 Everytime We Say Goodbye.mp3
-   title:Summertime&lt;tab&gt;file:/home/masui/Music/John Coltrane/My Favorite Things/03 Summertime.mp3
-   title:But Not For Me&lt;tab&gt;file:/home/masui/Music/John Coltrane/My Favorite Things/04 But Not For Me.mp3
+   title:My Favorite Things&lt;tab&gt;file:/home/pi/Music/John Coltrane/My Favorite Things/01 My Favorite Things.mp3
+   title:Everytime We Say Goodbye&lt;tab&gt;file:/home/pi/Music/John Coltrane/My Favorite Things/02 Everytime We Say Goodbye.mp3
+   title:Summertime&lt;tab&gt;file:/home/pi/Music/John Coltrane/My Favorite Things/03 Summertime.mp3
+   title:But Not For Me&lt;tab&gt;file:/home/pi/Music/John Coltrane/My Favorite Things/04 But Not For Me.mp3
 title:ムービー
- title:Rocky Horrow Show&lt;tab&gt;file:/home/masui/Movies/RockyHorrowPictureShow.mp4
- title:Planet Earth&lt;tab&gt;file:/home/masui/Movies/PlanetEarthA-1.mp4
+ title:Rocky Horrow Show&lt;tab&gt;file:/home/pi/Movies/RockyHorrowPictureShow.mp4
+ title:Planet Earth&lt;tab&gt;file:/home/pi/Movies/PlanetEarthA-1.mp4
 </pre>
 </blockquote>
 
@@ -378,6 +373,13 @@ Gearを起動すると最初に以下のようなテキストが表示されま�
 ソースコードは全部で150行ぐらいで、
 <a href="http://github.com/masui/RasPiGear">GitHub</a>に置いてあります。
 
+<p>
+別の工夫によってメニューをもっと格好良くすることはできるかもしれませんし、
+Raspberry Pi 2だとブラウザで問題なくプレーヤを構築できるかもしれません。
+いずれにしても、
+Raspberry PiをGearのようなインタフェースでメディアプレーヤとして使うことは
+将来性があるだろうと思っていますので、ぜひ試していただければと思います。
+
 <h2>おまけ</h2>
 
 2月に「<a href="http://www.amazon.co.jp/dp/433403845X">スマホに満足してますか? - ユーザインタフェースの心理学 -</a>」
@@ -386,7 +388,7 @@ Gearを起動すると最初に以下のようなテキストが表示されま�
 読んでみていただければ幸いです。
 
 <blockquote>
-<img src="http://images-jp.amazon.com/images/P/433403845X.01.LZZZZZZZ.jpg">
+<img src="http://images-jp.amazon.com/images/P/433403845X.01.LZZZZZZZ.jpg" height=400>
 </blockquote>
 
 </body>
