@@ -47,16 +47,15 @@ omxplayer
 というプログラムがよく使われています。
 omxplayerはRasPiのGPUを使って描画を行なうため、
 <!-- フレームバッファ上への描画に比べ -->
-動画ファイルやYouTube動画を快適に再生できます。
+手持ちの動画ファイルやYouTube動画を快適に再生できます。
 
 omxplayerはmp3のような音楽ファイルや
-ネットからの動画ストリーミングも再生できるので
-手持ちの動画や音楽、YouTube動画などを快適に再生することができます。
+ネットからの動画ストリーミングも再生できるので、
 RasPiをメディアプレーヤとして使う場合はomxplayerだけ用意しておけば充分でしょう。
 
 <h3>メニュー表示方式の選択</h3>
 
-Raspberry Piの画面に描画を行なうには以下の方法を使うことができます。
+Raspberry Piで画面に描画を行なうには以下の方法を使うことができます。
 
 <ol>
 <li>フレームバッファに書き込む
@@ -97,7 +96,7 @@ Xlibで直接X11に指令を出すこともできます。
 また、フレームバッファを利用して文字出力を行なう
 fbterm
 というプログラムを利用すると、
-VT100互換のターミナル画面を表示することができます。
+VT100互換のターミナル画面を様々なサイズで表示することができます。
 
 <li>OpenGL ES2
 <br>
@@ -117,8 +116,6 @@ SDLはCのライブラリですが、SDLを利用してRubyで実装された
 という2次元ゲームエンジンも利用することができます。
 </ol>
 
-<h3>Gearの実装</h3>
-
 <!--
 Gearでは、テキストベースのメニューを表示してコンテンツの選択を行ない、
 動画などを表示する必要があります。
@@ -130,24 +127,18 @@ Raspberry PiのX11上のブラウザでは
 他の方法を使う必要があります。
 -->
 
+表示に関してはこのように様々な選択枝がありますが、
+
 動画表示にomxplayerを使う場合、
 omxplayerはGPU機能を利用するため、
 GPUを利用する描画システムを使うことができません。
 つまり、omxplayerを使う場合は
 OpenGL ESやSDLでメニュー表示することができません。
 
-<!--
-RasPiでは、
-様々な環境で利用するグラフィクプラットフォームである「SDL」を利用して
-Rubyなどからオシャレな描画が可能なのですが、
-SDLもGPUを利用しているため残念ながらomxplayerと併用することができないようです。
-(SDLでメニューを描いているとき動画再生ができない)
--->
-
 また、
 X11上の描画システムを使えばomxplayerと共存はできるのですが、
 ブラウザのJavaScriptでは軽快にメニュー表示ができませんし、
-Javaなどを使う場合を同様です。
+Javaなどを使う場合も同様です。
 
 <p>
 幸いGearのメニューはテキストさえ表示できればそれなりに使えるので、
@@ -156,60 +147,40 @@ Javaなどを使う場合を同様です。
 
 ターミナル上にテキストを表示するには
 ncursesライブラリを利用することができます。
-残念ながら文字位置は行/桁単位でしか指定できませんからアニメーション表示はできませんし、
-色も規程された数色しか利用できません。
-そもそも
-ncursesライブラリというものは昔の文字端末で利用されていたオールドなものであり、
-今時のコンピュータとは思えないメニュー表示になってしまいますが、
+残念ながら文字位置は行/桁単位でしか指定できませんからアニメーション表示などは
+できませんし、色も規程された数色しか利用できません。
+<!-- そもそも
+ncursesライブラリというものは昔の文字端末で利用されていたオールドなものであり、-->
+今時のコンピュータとは思えない残念な感じのメニュー表示になってしまいますが、
 今回はとりあえずそれで我慢したいと思います。
 
-<!--
-一方、フレームバッファはGPUの管理する画面と別になっているようなので
-フレームバッファにテキストを「直書き」すれば
-omxplayerとバッティングは起こりません。
--->
-<!--
-RasPiを起動したとき表示される文字画面は
-フレームバッファを利用したターミナルが利用されており、
-ターミナルに文字列を出力すれば画面にテキストメニューを表示することができます。
--->
-<!--
-漢字を含む文字列を大きな文字で表示したい場合は
-fbterm というプログラムを利用すれば、
-UTF文字ターミナルを利用することができます。
--->
+<h3>入力装置の選択</h3>
 
-<h2>入力装置の選択</h2>
+普通のパソコンではキーボードとマウスが標準的な入力装置として利用されています。
+Raspberry Piではこれらの装置を普通に使えることに加え、
+ボード上のGPIO(General Purpose I/O)端子を入出力に利用することができるので、
+ちょっとしたスイッチやLEDなどを接続して利用することもできます。
 
-普通のパソコンではキーボードとマウスが標準的な入力装置として利用されていますが、
-RasPiにはGPIOという端子を入出力に利用することができるので、
-ちょっとしたスイッチやLEDなどを接続して利用することができます。
-
-Gearは2個の単純なスイッチだけを入力装置として利用できるので、
+Gearは2個の単純な入力装置があれば実現できるので、
 GPIOポートにマイクロスイッチなどを直結して利用することもできます。
 たとえば椅子にマイクロスイッチなどを接続しておいて
 そこからケーブルをGPIO端子に接続すれば、
 椅子の回転や傾きでGearの操作ができるというわけです。
 
-MIDI装置とか
-GPIOとか
-ワイヤレスマウス/キーボードとか
+その他、各種のMIDIコントローラのようなUSB接続の入力装置も利用できます。
 
 <p>
-今回は普通のマウスのホイールを入力装置として使ってみることにします。
-USBに挿して通信できるワイヤレスマウスは1000円以下で売っていますし、
-X11のようなウィンドウシステムを使わなくても
-マウスの操作をRasPiのプログラムで読むことが簡単にできるので、
+今回はワイヤレスマウスのホイールを入力装置として使ってみることにします。
+通信アダプタをUSBに挿して利用できるワイヤレスマウスは数百円で売られていますし、
+Raspberry PiではX11を使わなくても
+/dev/input/event0から
+マウス操作を取得できるので、
 ホイールの回転でGear操作を行なうことが妥当だと思います。
 
-RasPiでは
-マウスの状態は /dev/input/event0 から取得できるので、
-X11を起動しなくても簡単にマウスを利用することができます。
-
-
+<p>
 (ちなみに
 Raspbianには「pi」というアカウントが初期設定されており、
-omxplayerその他を利用できますが、
+omxplayerやマウス入力を利用できますが、
 異なるアカウントで使おうとすると
 /etc/group
 の設定を変更したり
@@ -269,19 +240,19 @@ end
 <pre>
 title:YouTube
  title:増井俊之
-  title:Slime	file:http://www.youtube.com/watch?v=Ldyl5UbbSA8
-  title:Gyazz	file:http://www.youtube.com/watch?v=RatK2q6SwFA
-  title:Dynamic Macro	file:http://www.youtube.com/watch?v=payhPO7Zi4w
+  title:Slime<tab>file:http://www.youtube.com/watch?v=Ldyl5UbbSA8
+  title:Gyazz<tab>file:http://www.youtube.com/watch?v=RatK2q6SwFA
+  title:Dynamic Macro<tab>file:http://www.youtube.com/watch?v=payhPO7Zi4w
 title:音楽
  title:John Coltrane
   title:My Favorite Things
-   title:My Favorite Things	file:/home/masui/Music/John Coltrane/My Favorite Things/01 My Favorite Things.mp3
-   title:Everytime We Say Goodbye	file:/home/masui/Music/John Coltrane/My Favorite Things/02 Everytime We Say Goodbye.mp3
-   title:Summertime	file:/home/masui/Music/John Coltrane/My Favorite Things/03 Summertime.mp3
-   title:But Not For Me	file:/home/masui/Music/John Coltrane/My Favorite Things/04 But Not For Me.mp3
+   title:My Favorite Things<tab>file:/home/masui/Music/John Coltrane/My Favorite Things/01 My Favorite Things.mp3
+   title:Everytime We Say Goodbye<tab>file:/home/masui/Music/John Coltrane/My Favorite Things/02 Everytime We Say Goodbye.mp3
+   title:Summertime<tab>file:/home/masui/Music/John Coltrane/My Favorite Things/03 Summertime.mp3
+   title:But Not For Me<tab>file:/home/masui/Music/John Coltrane/My Favorite Things/04 But Not For Me.mp3
 title:ムービー
- title:Rocky Horrow Show	file:/home/masui/Movies/RockyHorrowPictureShow.mp4
- title:Planet Earth	file:/home/masui/Movies/PlanetEarthA-1.mp4
+ title:Rocky Horrow Show<tab>file:/home/masui/Movies/RockyHorrowPictureShow.mp4
+ title:Planet Earth<tab>file:/home/masui/Movies/PlanetEarthA-1.mp4
 </pre>
 
 <h3>ナビゲーション</h3>
