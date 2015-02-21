@@ -231,6 +231,11 @@ addstr "abc"     # カーソル位置に"abc"表示
 </pre>
 </blockquote>
 
+Gearを起動する
+
+<blockquote>
+</blockquote>
+
 <h3>タイムアウト処理</h3>
 
 Gearでは、
@@ -311,12 +316,66 @@ File.open("/dev/input/event0","rb"){ |f|
 階層ltsvで記述したコンテンツ記述ファイルは最初に木構造に変換しておき、
 ホイール操作があるたびにmoveメソッドが呼ばれて
 選択項目とメニュー表示が変化し、
-選択中のコンテンツがomxplayerで再生されます。
+選択中のコンテンツをomxplayerで再生します。
+
+<h3>omxplayerによるコンテンツ再生</h3>
+
+階層ltsv内の「file:」で指定されているコンテンツを再生するときは
+以下のplayメソッドを呼び出します。
+YouTubeの場合は
+youtube-dlというプログラムを使って
+ストリーミング元URLを計算してからomxplayerを起動します。
+
+<blockquote><pre>
+def play(file)
+  system "killall omxplayer omxplayer.bin > /dev/null 2> /dev/null"
+  if file =~ /^http.*youtube.com/ then
+    stream = `youtube-dl -g #{file}`
+    system "omxplayer '#{stream.chomp}' > /dev/null &"
+  elsif file =~ /^\// then
+    system "omxplayer '#{file}' > /dev/null &"
+  end
+end
+</pre></blockquote>
+
+<h3>Gearの動き</h3>
+
+Gearを起動すると最初に以下のようなテキストが表示されます。
+
+<blockquote>
+<img src="figures/gear11.png" width=300>
+</blockquote>
+
+何もせずに1秒待つと以下のようにメニューが展開されます。
+
+<blockquote>
+<img src="figures/gear12.png" width=300>
+</blockquote>
+
+ここでマウスホイールを回転させると以下のように選択項目が移動します。
+
+<blockquote>
+<img src="figures/gear13.png" width=300>
+</blockquote>
+
+ここで1秒待ってメニューを展開させた後でマウスホイールを回すと
+以下のように「Planet Earth」を選択することができます。
+
+<blockquote>
+<img src="figures/gear14.png" width=300>
+</blockquote>
+
+ここで1秒待つと、以下のように「Planet Earth」の再生が始まります。
+
+<blockquote>
+<img src="figures/gear5.png" width=300>
+<img src="figures/gear6.png" width=300>
+</blockquote>
+
 
 <p>
-これらのソースコードは
+Gearのソースコードは全部で150行ぐらいで、
 <a href="http://github.com/masui/RasPiGear">GitHub</a>に置いてあります。
-全部で150行ぐらいで実装することができました。
 
 <h2>おまけ</h2>
 
