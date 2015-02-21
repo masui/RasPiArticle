@@ -25,7 +25,7 @@ def play(file)
 end
 
 def readltsv(file)
-  root = { 'title' => '全コンテンツ' }
+  root = { 'title' => 'Gear' }
   parents = [root]
   
   File.open(file){ |f|
@@ -160,4 +160,3 @@ File.open("/dev/input/event0","rb"){ |f|
     end
   end
 }
-
