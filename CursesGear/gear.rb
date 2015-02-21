@@ -1,8 +1,6 @@
 #!/usr/bin/env ruby
 # -*- coding: utf-8 -*-
 #
-# ltsvデータをJSONに変換
-#
 
 require 'json'
 require 'concurrent' # http://ruby-concurrency.github.io/concurrent-ruby/Concurrent/ScheduledTask.html
@@ -19,10 +17,10 @@ clear
 def play(file)
   system "killall omxplayer omxplayer.bin > /dev/null 2> /dev/null"
   if file =~ /^http.*youtube.com/ then
-    #stream = `youtube-dl -g #{file}`
-    #system "omxplayer '#{stream.chomp}' > /dev/null &"
+    stream = `youtube-dl -g #{file}`
+    system "omxplayer '#{stream.chomp}' > /dev/null &"
   elsif file =~ /^\// then
-    #system "omxplayer '#{file}' > /dev/null &"
+    system "omxplayer '#{file}' > /dev/null &"
   end
 end
 
@@ -109,14 +107,15 @@ def cls
 end
 
 def display
-  #cls
-  setpos 12,2
+  clear
+  center = lines / 2
+  setpos center,2
   addstr "======================================="
   @nodelist.each { |key,val|
-    setpos 12+key, 3+val['level'].to_i*2
+    setpos center+key, 3+val['level'].to_i*2
     addstr val['title']
   }
-  setpos 12,1
+  setpos center,1
   addstr "="
   refresh
   
