@@ -7,13 +7,13 @@
 <body>
 <h2>Raspberry Piをメディアサーバ/プレーヤにしよう (2)</h2>
 
-先月号が発売される直前(2014年2月)に
-Raspberry Pi 2
+先月号が発売された直前(2014年2月)に
+<a href="http://www.raspberrypi.org/products/raspberry-pi-2-model-b/">Raspberry Pi 2</a>
 が発表されました。
 従来型のものに比べてCPU性能が格段に向上し、
 X11のデスクトップ環境が格段に快適になったにもかかわらず
 価格は変わっていないので、
-これからRasPiを購入する人は迷わずRasPi2を購入するのが良いと思われます。
+これからRaspberry Piを購入する人は迷わずRaspberry Pi2を購入するのが良いと思われます。
 高速化によって、
 ますます汎用コンピュータとしての使い勝手が向上したといえるでしょう。
 
@@ -35,23 +35,27 @@ X11のデスクトップ環境が格段に快適になったにもかかわら�
 SDLだと良いのだが、SDLでメニューを出しながら動画を再生することはできない!
 
 X11上のブラウザやアプリを使いながらomxplayerを使えばいいのだが
-手持ちの旧RasPiではX11が遅いのであまり快適にGearを使うことができない
+手持ちの旧Raspberry PiではX11が遅いのであまり快適にGearを使うことができない
 
 仕方がないので、オールドではあるもののCursesを使うことにする。
 -->
 
 <h3>コンテンツの再生</h3>
 
-RasPiで動画を再生するのに
+Raspberry Piで動画を再生するのに
 omxplayer
 というプログラムがよく使われています。
-omxplayerはRasPiのGPUを使って描画を行なうため、
+omxplayerはRaspberry PiのGPUを使って描画を行なうため、
 <!-- フレームバッファ上への描画に比べ -->
 手持ちの動画ファイルやYouTube動画を快適に再生できます。
 
 omxplayerはmp3のような音楽ファイルや
 ネットからの動画ストリーミングも再生できるので、
-RasPiをメディアプレーヤとして使う場合はomxplayerだけ用意しておけば充分でしょう。
+Raspberry Piをメディアプレーヤとして使う場合はomxplayerだけ用意しておけば充分でしょう。
+
+<blockquote><pre>
+$ sudo apt-get install omxplayer
+</pre></blockquote>
 
 <h3>メニュー表示方式の選択</h3>
 
@@ -60,13 +64,13 @@ Raspberry Piで画面に描画を行なうには以下の方法を使うこと�
 <ol>
 <li>フレームバッファに書き込む
 <br>
-Raspbianブート時に表示されるコンソール画面は
-/dev/fb0
-からアクセスできるフレームバッファを利用して文字を描画しています。
-また
+Raspberry Piでは、他の多くのLinuxシステムと同じように、
 /dev/fb0
 にデータを書き込むことによって
-任意のビットマップ画面を表示することができます。
+ビットマップ画面を表示することができます。
+
+Raspbianのコンソール画面は
+これを利用して文字を描画しています。
 
 <li>GPUでグラフィクスを描画する
 <br>
@@ -79,6 +83,7 @@ OpenGL ES2などを使って高速なグラフィクス表示が可能です。
 これらの画面データは独立しており、
 GPUで描画した画像データを /dev/fd0 から読むことはできません。
 
+<p>
 これらのハードウェア機能を利用して、
 以下のような方法で文字や図形描画することができます。
 
@@ -98,7 +103,7 @@ fbterm
 というプログラムを利用すると、
 VT100互換のターミナル画面を様々なサイズで表示することができます。
 
-<li>OpenGL ES2
+<li><a href="http://ja.wikipedia.org/wiki/OpenGL_ES">OpenGL ES2</a>を使う
 <br>
 OpenGL ES2の機能をフルに使った3Dグラフィクスを描画可能です。
 Raspbianでは
@@ -106,11 +111,10 @@ Raspbianでは
 の下に沢山のサンプルが入っており、
 ビルドして試してみることができます。
 
-<li>SDL2
+<li><a href="https://wiki.libsdl.org/">SDL</a>を使う
 <br>
 クロスプラットフォームのマルチメディアライブラリである
-<a href="https://wiki.libsdl.org/">SDL</a>を
-利用して描画やサウンドの再生などを行なうことができます。
+SDLを利用して描画やサウンドの再生などを行なうことができます。
 SDLはCのライブラリですが、SDLを利用してRubyで実装された
 <a href="https://github.com/jlnr/gosu">Gosu</a>
 という2次元ゲームエンジンも利用することができます。
@@ -128,15 +132,13 @@ Raspberry PiのX11上のブラウザでは
 -->
 
 表示に関してはこのように様々な選択枝がありますが、
-
-動画表示にomxplayerを使う場合、
-omxplayerはGPU機能を利用するため、
-GPUを利用する描画システムを使うことができません。
+GPUを利用するomxplayerで動画を表示する場合、
+GPUベースの描画システムを使うことができません。
 つまり、omxplayerを使う場合は
 OpenGL ESやSDLでメニュー表示することができません。
 
 また、
-X11上の描画システムを使えばomxplayerと共存はできるのですが、
+X11上の描画システムはomxplayerと共存はできるのですが、
 ブラウザのJavaScriptでは軽快にメニュー表示ができませんし、
 Javaなどを使う場合も同様です。
 
@@ -145,25 +147,26 @@ Javaなどを使う場合も同様です。
 今回はfbterm上に表示するテキストで
 メニュー操作を行なうことにします。
 
-ターミナル上にテキストを表示するには
-ncursesライブラリを利用することができます。
-残念ながら文字位置は行/桁単位でしか指定できませんからアニメーション表示などは
-できませんし、色も規程された数色しか利用できません。
-<!-- そもそも
-ncursesライブラリというものは昔の文字端末で利用されていたオールドなものであり、-->
+残念ながら文字位置を行/桁単位でしか指定できませんから
+なめらかなアニメーション表示などはできませんし、
+色も規程された数色しか利用できず、
 今時のコンピュータとは思えない残念な感じのメニュー表示になってしまいますが、
 今回はとりあえずそれで我慢したいと思います。
 
+ターミナル上のテキスト表示には
+ncurses
+という古典的なライブラリを利用します。
+
 <h3>入力装置の選択</h3>
 
-普通のパソコンではキーボードとマウスが標準的な入力装置として利用されています。
+普通のパソコンではキーボードとマウスが標準的な入力装置として利用されていますが、
 Raspberry Piではこれらの装置を普通に使えることに加え、
 ボード上のGPIO(General Purpose I/O)端子を入出力に利用することができるので、
 ちょっとしたスイッチやLEDなどを接続して利用することもできます。
 
-Gearは2個の単純な入力装置があれば実現できるので、
+Gearは2個の単純な入力装置があれば実装できるので、
 GPIOポートにマイクロスイッチなどを直結して利用することもできます。
-たとえば椅子にマイクロスイッチなどを接続しておいて
+たとえば椅子にマイクロスイッチを接続しておいて
 そこからケーブルをGPIO端子に接続すれば、
 椅子の回転や傾きでGearの操作ができるというわけです。
 
@@ -171,16 +174,16 @@ GPIOポートにマイクロスイッチなどを直結して利用すること�
 
 <p>
 今回はワイヤレスマウスのホイールを入力装置として使ってみることにします。
-通信アダプタをUSBに挿して利用できるワイヤレスマウスは数百円で売られていますし、
+ワイヤレスマウスは数百円で売られていますし、
 Raspberry PiではX11を使わなくても
-/dev/input/event0から
-マウス操作を取得できるので、
-ホイールの回転でGear操作を行なうことが妥当だと思います。
+/dev/input/event0
+からマウス操作を取得できるので、
+ホイールの前方/後方回転でGear操作を行なうことにします。
 
 <p>
 (ちなみに
-Raspbianには「pi」というアカウントが初期設定されており、
-omxplayerやマウス入力を利用できますが、
+Raspbianで初期設定されている「pi」というアカウントでは
+omxplayerやマウス入力を問題なく利用できますが、
 異なるアカウントで使おうとすると
 /etc/group
 の設定を変更したり
@@ -190,7 +193,7 @@ omxplayerやマウス入力を利用できますが、
 
 <h2>Gearの実装</h2>
 
-入力方法と出力方法が決まったので、RasPi上にGearを実装していきたいと思います。
+入力方法と出力方法が決まったので、Raspberry Pi上にGearを実装していきたいと思います。
 すべてをRubyで記述することにします。
 
 <h3>メニュー表示</h3>
@@ -201,63 +204,119 @@ omxplayerやマウス入力を利用できますが、
 fbterm
 を利用して大きな文字を表示します。
 
+<blockquote>
+<pre>
+$ sudo apt-get install fbterm
+$ fbterm --font-size=50
+</pre>
+</blockquote>
+
+ncursesはgemでインストールし、
+テキストの表示には
 ncursesで用意されている以下の関数を利用します。 
 
-<ul>
-<li>カーソル移動
-<li>文字列表示
-<li>クリヤ
-</ul>
+<!--
+<blockquote>
+<pre>
+$ sudo gem install ncurses
+</pre>
+</blockquote>
+-->
+
+<blockquote>
+<pre>
+require "curses" # ncursesライブラリ
+setpos 10, 2     # 10行目の2桁目にカーソル移動
+addstr "abc"     # カーソル位置に"abc"表示
+</pre>
+</blockquote>
 
 <h3>タイムアウト処理</h3>
 
 Gearでは、
-選択中の項目に子要素があるときにユーザが何も操作を行なわなければ
+選択中の項目に子要素が存在するときユーザが何も操作を行なわなければ
 子要素を自動的に展開してその最初の項目を選択するようになっています。
 このようなタイムアウト処理はJavaScriptではsetTimeout()で簡単に指定できますが、
 Rubyにはタイムアウト関数が用意されていませんので、
 ruby-concurrency
 というgemを使うことにします。
-(gem install ruby-concurrency-ext)
+
+<!--
+<blockquote>
+<pre>
+$ sudo gem install ruby-concurrency-ext
+</pre>
+</blockquote>
+-->
 
 10秒後に何かを実行したい場合は以下のようにします。
-明示的にスレッドを起動する必要がないので便利です。
+明示的にスレッドを起動する必要がないので簡単です。
 
+<blockquote>
 <pre>
+require 'concurrent'
 Concurrent::ScheduledTask.execute 10 do
   do_something # 10秒後に実行される処理
 end
 </pre>
+</blockquote>
 
 <h3>コンテンツの記述</h3>
 
 音楽や動画などのコンテンツは内容に従って階層的に分類しておきます。
 階層的なデータを表現する方法はいろいろありますが、
-ここでは「ltsv」にインデントを追加した「階層ltsv」を使うことにします。
-たとえば以下のような記述では、
+ここでは
+<a href="http://ltsv.org/">ltsv</a>
+にインデントを追加した「階層ltsv」を使うことにします。
+たとえば以下の記述では、
 「YouTube」の「増井俊之」に3個のコンテンツが含まれていることを表現しています。
+(&lt;tab&gt;はタブ文字)
 
+<blockquote>
 <pre>
 title:YouTube
  title:増井俊之
-  title:Slime<tab>file:http://www.youtube.com/watch?v=Ldyl5UbbSA8
-  title:Gyazz<tab>file:http://www.youtube.com/watch?v=RatK2q6SwFA
-  title:Dynamic Macro<tab>file:http://www.youtube.com/watch?v=payhPO7Zi4w
+  title:Slime&lt;tab&gt;file:http://www.youtube.com/watch?v=Ldyl5UbbSA8
+  title:Gyazz&lt;tab&gt;file:http://www.youtube.com/watch?v=RatK2q6SwFA
+  title:Dynamic Macro&lt;tab&gt;file:http://www.youtube.com/watch?v=payhPO7Zi4w
 title:音楽
  title:John Coltrane
   title:My Favorite Things
-   title:My Favorite Things<tab>file:/home/masui/Music/John Coltrane/My Favorite Things/01 My Favorite Things.mp3
-   title:Everytime We Say Goodbye<tab>file:/home/masui/Music/John Coltrane/My Favorite Things/02 Everytime We Say Goodbye.mp3
-   title:Summertime<tab>file:/home/masui/Music/John Coltrane/My Favorite Things/03 Summertime.mp3
-   title:But Not For Me<tab>file:/home/masui/Music/John Coltrane/My Favorite Things/04 But Not For Me.mp3
+   title:My Favorite Things&lt;tab&gt;file:/home/masui/Music/John Coltrane/My Favorite Things/01 My Favorite Things.mp3
+   title:Everytime We Say Goodbye&lt;tab&gt;file:/home/masui/Music/John Coltrane/My Favorite Things/02 Everytime We Say Goodbye.mp3
+   title:Summertime&lt;tab&gt;file:/home/masui/Music/John Coltrane/My Favorite Things/03 Summertime.mp3
+   title:But Not For Me&lt;tab&gt;file:/home/masui/Music/John Coltrane/My Favorite Things/04 But Not For Me.mp3
 title:ムービー
- title:Rocky Horrow Show<tab>file:/home/masui/Movies/RockyHorrowPictureShow.mp4
- title:Planet Earth<tab>file:/home/masui/Movies/PlanetEarthA-1.mp4
+ title:Rocky Horrow Show&lt;tab&gt;file:/home/masui/Movies/RockyHorrowPictureShow.mp4
+ title:Planet Earth&lt;tab&gt;file:/home/masui/Movies/PlanetEarthA-1.mp4
 </pre>
+</blockquote>
 
-<h3>ナビゲーション</h3>
+<h3>マウスホイール操作の取得とナビゲーション</h3>
 
-これらの機能を全部入れると150行ぐらいでした。
+メインルーチンで以下のようにしてマウス操作を取得します。
+
+<blockquote><pre>
+File.open("/dev/input/event0","rb"){ |f|
+  while true do
+    s = f.read 16
+    (time, type, code, value) = s.unpack "qssi"
+    if type == 2 and code == 8 then
+      move value
+    end
+  end
+}
+</pre></blockquote>
+
+階層ltsvで記述したコンテンツ記述ファイルは最初に木構造に変換しておき、
+ホイール操作があるたびにmoveメソッドが呼ばれて
+選択項目とメニュー表示が変化し、
+選択中のコンテンツがomxplayerで再生されます。
+
+<p>
+これらのソースコードは
+<a href="http://github.com/masui/RasPiGear">GitHub</a>に置いてあります。
+全部で150行ぐらいで実装することができました。
 
 <h2>おまけ</h2>
 
